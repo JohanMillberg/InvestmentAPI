@@ -1,0 +1,2 @@
+FLASK_APP=investing.py
+FLASK_ENV=development
