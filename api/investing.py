@@ -1,31 +1,31 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-import pandas_datareader.data as web
 import yfinance as yf
 from pandas_datareader._utils import RemoteDataError
 import matplotlib
 import matplotlib.pyplot as plt
 import pickle
-from flask import Flask, render_template, request, jsonify
-import base64, io
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import base64
+import io
 
 # TODO - Make the endpoint run_simulation return a json object with a list of 
 # Base 64 strings that unserialize to the plots of stocks.
 
-# TODO - Create a front end solution for creating the POST request to run_simulation 
-
 matplotlib.use('SVG')
-        
+
 app = Flask(__name__)
+CORS(app)
+
 
 def plot_stock(ticker, titles, start_date, end_date, all_returns):
     data = yf.Ticker(ticker)
     prices = data.history(start=start_date, end=end_date).Close
     prices.index = pd.to_datetime(prices.index)
-    
 
-    plt.figure(figsize=(12,6))
+    plt.figure(figsize=(12, 6))
     plt.subplot(2, 1, 1)
     prices.plot()
     plt.title(titles[0], fontsize=16)
@@ -47,12 +47,13 @@ def plot_stock(ticker, titles, start_date, end_date, all_returns):
 
     return image_base64
 
-def perform_analysis(ticker, start_date, end_date, return_period_weeks, verbose=False):
+
+def perform_analysis(ticker, start_date, end_date,
+                     return_period_weeks, verbose=False):
 
     try:
         data = yf.Ticker(ticker)
         prices = data.history(start=start_date, end=end_date).Close
-        
     except (RemoteDataError, KeyError):
         return -np.inf, np.inf, None
 
@@ -77,9 +78,11 @@ def perform_analysis(ticker, start_date, end_date, return_period_weeks, verbose=
     if len(return_after_period) == 0:
         return -np.inf, np.inf, None
 
-    return np.mean(return_after_period), np.std(return_after_period), [buy_dates, return_after_period]
+    return np.mean(return_after_period), np.std(return_after_period), \
+        [buy_dates, return_after_period]
 
-@app.route('/get_stocks', methods= ['POST'])
+
+@app.route('/get_stocks', methods=['POST'])
 def run_simulation():
     data = request.get_json()
 
@@ -94,7 +97,10 @@ def run_simulation():
 
     series_tickers = pickle.load(open("data/swedish_tickers.p", "rb"))
     for ticker, name in series_tickers.items():
-        avg_return, std_dev_return, all_returns = perform_analysis(ticker, start, end, return_period_weeks)
+        avg_return, std_dev_return, all_returns = perform_analysis(ticker,
+                                                                   start,
+                                                                   end,
+                                                                   return_period_weeks)
 
         if avg_return > min_avg_return and std_dev_return < max_dev_return:
             title_price = f"{ticker}\n{name}"
@@ -104,5 +110,5 @@ def run_simulation():
     return jsonify({"plots": plot_strings})
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     app.run(debug=True)
