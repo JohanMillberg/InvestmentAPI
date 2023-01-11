@@ -97,15 +97,18 @@ def run_simulation():
 
     series_tickers = pickle.load(open("data/swedish_tickers.p", "rb"))
     for ticker, name in series_tickers.items():
-        avg_return, std_dev_return, all_returns = perform_analysis(ticker,
-                                                                   start,
-                                                                   end,
-                                                                   return_period_weeks)
+        avg_return, std_dev_return, all_returns = \
+            perform_analysis(ticker,
+                             start,
+                             end,
+                             return_period_weeks)
 
         if avg_return > min_avg_return and std_dev_return < max_dev_return:
             title_price = f"{ticker}\n{name}"
             title_return = f"Avg return: {round(100*avg_return, 2)}pct | Dev return: {round(100* std_dev_return, 2)}pct"
-            plot_strings.append(plot_stock(ticker, [title_price, title_return], start, end, all_returns))
+            plot_strings.append(plot_stock(ticker,
+                                           [title_price, title_return],
+                                           start, end, all_returns))
 
     return jsonify({"plots": plot_strings})
 
