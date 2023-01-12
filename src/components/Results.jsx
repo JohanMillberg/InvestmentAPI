@@ -1,4 +1,12 @@
-const Results = ({ plots }) => {
+const Results = ({ plots, status }) => {
+  if (status === "loading") {
+    return (
+      <div className="results">
+        <h2>Fetching stocks...</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="results">
       {plots.map((plot) => (
