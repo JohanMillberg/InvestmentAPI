@@ -11,16 +11,19 @@ function PlotForm() {
     max_dev_return: 0.07,
   });
 
-  const [resultMessage, setResultMessage] = useState(
-    "Specify properties of stocks"
-  );
+  const [hasStarted, setHasStarted] = useState(false);
+
+  const [resultMessage, setResultMessage] = useState("");
 
   useEffect(() => {
-    if (!plots.length) {
+    if (!hasStarted) {
+      setResultMessage("Specify properties of stocks")
+    } else if (!plots.length && hasStarted) {
       setResultMessage("No stocks with desired properties found");
     } else {
       setResultMessage("The following stocks match the given specifications");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plots]);
 
   var DEV_ENDPOINT = "http://localhost:5000/get_stocks";
@@ -36,6 +39,7 @@ function PlotForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setHasStarted(true);
     setResultMessage("Fetching plots...");
 
     var response = await fetch(DEV_ENDPOINT, {

@@ -62,7 +62,7 @@ def perform_analysis(ticker, start_date, end_date,
     return_after_period = []
     buy_dates = []
 
-    for buy_date, buy_price in prices.iteritems():
+    for buy_date, buy_price in prices.items():
         sell_date = buy_date + timedelta(weeks=return_period_weeks)
 
         try:

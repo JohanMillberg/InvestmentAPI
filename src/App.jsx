@@ -7,7 +7,9 @@ import { createRoot } from "react-dom/client";
 function App() {
   return (
     <div className="App">
-      <header className="App-header"></header>
+      <header className="App-header">
+        <h1>Investment API</h1>
+      </header>
       <PlotForm />
     </div>
   );
