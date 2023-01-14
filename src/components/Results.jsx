@@ -1,3 +1,5 @@
+import Carousel from "./Carousel";
+
 const Results = ({ plots, status }) => {
   if (status === "loading") {
     return (
@@ -9,13 +11,7 @@ const Results = ({ plots, status }) => {
 
   return (
     <div className="results">
-      {plots.map((plot) => (
-        <img
-          key={`${plot}`}
-          src={`data:image/png;base64,${plot}`}
-          alt="A stock plot"
-        />
-      ))}
+      {plots.length > 0 && <Carousel plots={plots} />}
     </div>
   );
 };
